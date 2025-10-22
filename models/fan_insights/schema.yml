@@ -1,0 +1,21 @@
+version: 2
+
+sources:
+  - name: sports_fan_behavior
+    description: "Source Snowflake table with raw sports fan transactions."
+    database: PC_DBT_DB
+    schema: DBT_THANSEN
+    tables:
+      - name: SPORTS_FAN_BEHAVIOR
+        description: "Raw sports fans dataset. Contains information about there sports interest, latest purchase in a given brand and amount"
+
+  - name: brand_sponserships
+    description: "Seed dataset containing brand sponsorship investment data."
+    tables:
+      - name: brand_sponserships
+        description: >
+          "brand_sponsorship containts information about different sponsorships by brands in a specific sport. It also includes the amount of money invested in the sponsorships"
+
+
+
+
