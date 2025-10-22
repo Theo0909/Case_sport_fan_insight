@@ -19,3 +19,76 @@ sources:
 
 
 
+
+
+models:
+  - name: stg_fan_behavior
+    description: "Cleans and standardizes the raw sports fan behavior dataset."
+    columns:
+      - name: audience
+        description: "Fan group or population segment."
+        tests:
+          - not_null
+
+      - name: brand
+        description: "Brand associated with the transaction."
+        tests:
+          - not_null
+
+      - name: category
+        description: "Industry category (e.g., Apparel, Energy Drinks)."
+        tests:
+          - not_null
+
+      - name: subcategory
+        description: "More distinct identifier within an industry."
+        tests:
+          - not_null
+
+      - name: comparison_population
+        description: "The baseline group used for comparison."
+        tests:
+          - not_null
+
+      - name: percent_composition
+        description: "Percent of audience showing a specific behavior (0–1)."
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0 AND percent_composition <= 1"
+
+      - name: population_index
+        description: "Relative difference between percent compositions."
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+
+      - name: subcategory_rank
+        description: "Ranking of subcategory within a given year."
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 1"
+
+      - name: spend
+        description: "Transaction spend in USD."
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+
+      - name: region
+        description: "Region of the fan (US-based segmentation)."
+        tests:
+          - accepted_values:
+              values: ['West', 'Midwest', 'Northeast', 'South']
+
+      - name: transaction_date
+        description: "Year when the transaction occurred."
+        tests:
+          - not_null
