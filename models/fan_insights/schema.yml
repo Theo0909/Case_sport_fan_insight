@@ -20,75 +20,95 @@ sources:
 
 
 
-
 models:
   - name: stg_fan_behavior
-    description: "Cleans and standardizes the raw sports fan behavior dataset."
+    description: "Cleans and standardizes raw fan behavior data."
     columns:
-      - name: audience
-        description: "Fan group or population segment."
+      - name: fan_behavior_id
+        description: "Unique identifier for each fan behavior record."
+        tests: [unique, not_null]
+      - name: spend
+        description: "Amount spent by fans."
         tests:
           - not_null
-
-      - name: brand
-        description: "Brand associated with the transaction."
-        tests:
-          - not_null
-
-      - name: category
-        description: "Industry category (e.g., Apparel, Energy Drinks)."
-        tests:
-          - not_null
-
-      - name: subcategory
-        description: "More distinct identifier within an industry."
-        tests:
-          - not_null
-
-      - name: comparison_population
-        description: "The baseline group used for comparison."
-        tests:
-          - not_null
-
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
       - name: percent_composition
-        description: "Percent of audience showing a specific behavior (0–1)."
+        description: "Share of total spend (0–1)."
         tests:
-          - not_null
           - dbt_utils.expression_is_true:
               arguments:
                 expression: ">= 0 AND percent_composition <= 1"
-
-      - name: population_index
-        description: "Relative difference between percent compositions."
-        tests:
-          - not_null
-          - dbt_utils.expression_is_true:
-              arguments:
-                expression: ">= 0"
-
-      - name: subcategory_rank
-        description: "Ranking of subcategory within a given year."
-        tests:
-          - not_null
-          - dbt_utils.expression_is_true:
-              arguments:
-                expression: ">= 1"
-
-      - name: spend
-        description: "Transaction spend in USD."
-        tests:
-          - not_null
-          - dbt_utils.expression_is_true:
-              arguments:
-                expression: ">= 0"
-
       - name: region
-        description: "Region of the fan (US-based segmentation)."
+        description: "Geographical region."
         tests:
           - accepted_values:
-              values: ['West', 'Midwest', 'Northeast', 'South']
+              arguments:
+                values: ['West', 'Midwest', 'Northeast', 'South']
+  - name: dim_brand
+    description: "Brand dimension enriched with sponsorship data."
+    columns:
+      - name: brand_key
+        tests: [unique, not_null]
+      - name: sponsorship_value
+        tests:
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
 
-      - name: transaction_date
-        description: "Year when the transaction occurred."
+  - name: dim_audience
+    description: "Audience dimension."
+    columns:
+      - name: audience_key
+        tests: [unique, not_null]
+
+  - name: dim_region
+    description: "Region dimension."
+    columns:
+      - name: region_key
+        tests: [unique, not_null]
+        
+      - name: region
+        description: "Region name (e.g. West, Midwest, Northeast, South)."
         tests:
           - not_null
+          - accepted_values:
+              arguments:
+                values: ['West', 'Midwest', 'Northeast', 'South']
+
+  - name: dim_category
+    description: "Category/subcategory dimension."
+    columns:
+      - name: category_key
+        tests: [unique, not_null]
+
+  - name: fact_fan_spend
+    description: "Fact table linking all fan spend transactions."
+    columns:
+      - name: fact_fan_spend_key
+        tests: [unique, not_null]
+      - name: brand_key
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_brand')
+                field: brand_key
+      - name: audience_key
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_audience')
+                field: audience_key
+      - name: region_key
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_region')
+                field: region_key
+      - name: category_key
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_category')
+                field: category_key
