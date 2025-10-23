@@ -1,9 +1,12 @@
 {{ config(materialized='table') }}
 
+WITH cat_base AS(
 SELECT
-    {{ dbt_utils.generate_surrogate_key(['category', 'subcategory']) }} AS category_key,
+    {{ dbt_utils.generate_surrogate_key(['category']) }} AS category_key,
     category,
     subcategory,
-    subcategory_rank
 FROM {{ ref('stg_fan_behavior') }}
-GROUP BY 1, 2, 3, 4
+GROUP BY 1, 2, 3
+)
+
+SELECT * FROM cat_base

@@ -3,19 +3,16 @@
 WITH base AS (
     SELECT
         {{ dbt_utils.generate_surrogate_key(['brand']) }} AS brand_key,
-        brand,
-        category,
-        subcategory
+        brand, 
     FROM {{ ref('stg_fan_behavior') }}
-    GROUP BY 1, 2, 3, 4
+    GROUP BY 1, 2
 ),
 
 enriched AS (
     SELECT
         b.brand_key,
         b.brand,
-        b.category,
-        b.subcategory,
+        s.sport,
         s.sponsorship_type,
         s.sponsorship_tier,
         s.spend_million_usd,
@@ -25,4 +22,5 @@ enriched AS (
         ON b.brand = s.brand
 )
 
-SELECT * FROM enriched
+SELECT * 
+FROM enriched

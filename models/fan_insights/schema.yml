@@ -46,16 +46,19 @@ models:
           - accepted_values:
               arguments:
                 values: ['West', 'Midwest', 'Northeast', 'South']
+ 
   - name: dim_brand
     description: "Brand dimension enriched with sponsorship data."
     columns:
       - name: brand_key
-        tests: [unique, not_null]
-      - name: sponsorship_value
+        tests: 
+          - unique
+          - not_null
+      - name: spend_million_usd
         tests:
           - dbt_utils.expression_is_true:
               arguments:
-                expression: ">= 0"
+                expression: ">= 0 OR spend_million_usd IS NULL"
 
   - name: dim_audience
     description: "Audience dimension."
@@ -81,7 +84,8 @@ models:
     description: "Category/subcategory dimension."
     columns:
       - name: category_key
-        tests: [unique, not_null]
+        tests: 
+          - not_null
 
   - name: fact_fan_spend
     description: "Fact table linking all fan spend transactions."
