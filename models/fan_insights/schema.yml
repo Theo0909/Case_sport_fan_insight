@@ -1,5 +1,6 @@
 version: 2
 
+#Data sources
 sources:
   - name: sports_fan_behavior
     description: "Source Snowflake table with raw sports fan transactions."
@@ -19,7 +20,7 @@ sources:
 
 
 
-
+#genetic test on values in the tables
 models:
   - name: stg_fan_behavior
     description: "Cleans and standardizes raw fan behavior data."
@@ -50,18 +51,20 @@ models:
                 values: ['West', 'Midwest', 'Northeast', 'South']
  
   - name: dim_brand
-    description: "Brand dimension enriched with sponsorship data."
+    description: "Contains brand-level information and related sponsorship attributes."
     columns:
       - name: brand_key
-        tests: 
-          - unique
-          - not_null
-      - name: spend_million_usd
         tests:
-          - dbt_utils.expression_is_true:
-              arguments:
-                expression: ">= 0 OR spend_million_usd IS NULL"
-
+          - not_null
+          - unique
+      - name: brand
+        tests:
+          - not_null
+      - name: category
+        description: "High-level industry classification for the brand."
+      - name: subcategory
+        description: "More specific segment within the brand category."
+  
   - name: dim_audience
     description: "Audience dimension."
     columns:
@@ -85,14 +88,37 @@ models:
           - accepted_values:
               arguments:
                 values: ['West', 'Midwest', 'Northeast', 'South']
-
-  - name: dim_category
-    description: "Category/subcategory dimension."
+  
+  - name: dim_sponsorship
+    description: "a dimension which hold information about sponsorship investments for different brands"
     columns:
-      - name: category_key
-        tests: 
+      - name: sponsorship_key
+        description: "unique surrogate key identifier for each sponsorship inevestment"
+        tests:
           - not_null
+          - unique
 
+      - name: brand_key
+        description: "foreign key that links sponsorship to dim_brand."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_brand')
+                field: brand_key
+
+      - name: sponsorship_invest
+        description: "Sponsorship spending in millions of USD. Can be null if not applicable."
+        tests:
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0 OR sponsorship_invest IS NULL"
+
+          
+          
+
+  
+  #Fact table with defined relationships to the different dimensions
   - name: fact_fan_spend
     description: "Fact table linking all fan spend transactions."
     columns:
@@ -118,9 +144,4 @@ models:
               arguments:
                 to: ref('dim_region')
                 field: region_key
-      - name: category_key
-        tests:
-          - relationships:
-              arguments:
-                to: ref('dim_category')
-                field: category_key
+
