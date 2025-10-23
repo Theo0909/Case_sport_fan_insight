@@ -57,9 +57,7 @@ joined AS (
 SELECT
     sponsorship_key,
     brand_key,
-    brand,
-    category,
-    subcategory,
+    brand
     sport,
     sponsorship_type,
     sponsorship_tier,
