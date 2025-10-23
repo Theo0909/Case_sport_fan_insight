@@ -1,0 +1,118 @@
+version: 2
+
+sources:
+  - name: sports_fan_behavior
+    description: "Source Snowflake table with raw sports fan transactions."
+    database: PC_DBT_DB
+    schema: DBT_THANSEN
+    tables:
+      - name: SPORTS_FAN_BEHAVIOR
+        description: "Raw sports fans dataset. Contains information about there sports interest, latest purchase in a given brand and amount"
+
+  - name: brand_sponserships
+    description: "Seed dataset containing brand sponsorship investment data."
+    tables:
+      - name: brand_sponserships
+        description: >
+          "brand_sponsorship containts information about different sponsorships by brands in a specific sport. It also includes the amount of money invested in the sponsorships"
+
+
+
+
+
+models:
+  - name: stg_fan_behavior
+    description: "Cleans and standardizes raw fan behavior data."
+    columns:
+      - name: fan_behavior_id
+        description: "Unique identifier for each fan behavior record."
+        tests: [unique, not_null]
+      - name: spend
+        description: "Amount spent by fans."
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+      - name: percent_composition
+        description: "Share of total spend (0–1)."
+        tests:
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0 AND percent_composition <= 1"
+      - name: region
+        description: "Geographical region."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['West', 'Midwest', 'Northeast', 'South']
+ 
+  - name: dim_brand
+    description: "Brand dimension enriched with sponsorship data."
+    columns:
+      - name: brand_key
+        tests: 
+          - unique
+          - not_null
+      - name: spend_million_usd
+        tests:
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0 OR spend_million_usd IS NULL"
+
+  - name: dim_audience
+    description: "Audience dimension."
+    columns:
+      - name: audience_key
+        tests: [unique, not_null]
+
+  - name: dim_region
+    description: "Region dimension."
+    columns:
+      - name: region_key
+        tests: [unique, not_null]
+        
+      - name: region
+        description: "Region name (e.g. West, Midwest, Northeast, South)."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['West', 'Midwest', 'Northeast', 'South']
+
+  - name: dim_category
+    description: "Category/subcategory dimension."
+    columns:
+      - name: category_key
+        tests: 
+          - not_null
+
+  - name: fact_fan_spend
+    description: "Fact table linking all fan spend transactions."
+    columns:
+      - name: fact_fan_spend_key
+        tests: [unique, not_null]
+      - name: brand_key
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_brand')
+                field: brand_key
+      - name: audience_key
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_audience')
+                field: audience_key
+      - name: region_key
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_region')
+                field: region_key
+      - name: category_key
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_category')
+                field: category_key
