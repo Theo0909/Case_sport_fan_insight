@@ -8,7 +8,7 @@ SELECT
     {{ dbt_utils.generate_surrogate_key(['brand']) }} AS brand_key,
     {{ dbt_utils.generate_surrogate_key(['audience']) }} AS audience_key,
     {{ dbt_utils.generate_surrogate_key(['region']) }} AS region_key,
-    {{ dbt_utils.generate_surrogate_key(['category', 'subcategory']) }} AS category_key,
+    {{ dbt_utils.generate_surrogate_key(['category']) }} AS category_key,
 
     --  Measures
     spend,

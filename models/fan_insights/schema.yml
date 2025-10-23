@@ -26,7 +26,9 @@ models:
     columns:
       - name: fan_behavior_id
         description: "Unique identifier for each fan behavior record."
-        tests: [unique, not_null]
+        tests: 
+          - unique
+          - not_null
       - name: spend
         description: "Amount spent by fans."
         tests:
@@ -64,13 +66,17 @@ models:
     description: "Audience dimension."
     columns:
       - name: audience_key
-        tests: [unique, not_null]
+        tests: 
+          - unique
+          - not_null
 
   - name: dim_region
     description: "Region dimension."
     columns:
       - name: region_key
-        tests: [unique, not_null]
+        tests: 
+          - unique 
+          - not_null
         
       - name: region
         description: "Region name (e.g. West, Midwest, Northeast, South)."
@@ -91,7 +97,9 @@ models:
     description: "Fact table linking all fan spend transactions."
     columns:
       - name: fact_fan_spend_key
-        tests: [unique, not_null]
+        tests: 
+          - unique
+          - not_null
       - name: brand_key
         tests:
           - relationships:
