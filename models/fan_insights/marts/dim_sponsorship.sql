@@ -58,8 +58,6 @@ SELECT
     sponsorship_key,
     brand_key,
     brand,
-    category,
-    subcategory,
     sport,
     sponsorship_type,
     sponsorship_tier,
