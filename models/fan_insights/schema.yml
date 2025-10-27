@@ -20,7 +20,7 @@ sources:
 
 
 
-#genetic test on values in the tables
+#genetic test on staging data 
 models:
   - name: stg_fan_behavior
     description: "Cleans and standardizes raw fan behavior data."
@@ -37,26 +37,12 @@ models:
           - dbt_utils.expression_is_true:
               arguments:
                 expression: ">= 0"
-      - name: percent_composition
-        description: "Share of total spend (0–1)."
-        tests:
-          - dbt_utils.expression_is_true:
-              arguments:
-                expression: ">= 0 AND percent_composition <= 1"
       - name: region
         description: "Geographical region."
         tests:
           - accepted_values:
               arguments:
                 values: ['West', 'Midwest', 'Northeast', 'South']
- 
-  - name: dim_brand
-    description: "Contains brand-level information and related sponsorship attributes."
-    columns:
-      - name: brand_key
-        tests:
-          - not_null
-          - unique
       - name: brand
         tests:
           - not_null
@@ -64,6 +50,24 @@ models:
         description: "High-level industry classification for the brand."
       - name: subcategory
         description: "More specific segment within the brand category."
+ 
+
+ # Key uniqueness test 
+  - name: dim_brand
+    description: "Contains brand-level information and related sponsorship attributes."
+    columns:
+      - name: brand_key
+        tests:
+          - not_null
+          - unique
+      - name: category_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_category')
+                field: category_key
+  
   
   - name: dim_audience
     description: "Audience dimension."
@@ -73,6 +77,7 @@ models:
           - unique
           - not_null
 
+
   - name: dim_region
     description: "Region dimension."
     columns:
@@ -80,39 +85,65 @@ models:
         tests: 
           - unique 
           - not_null
-        
-      - name: region
-        description: "Region name (e.g. West, Midwest, Northeast, South)."
-        tests:
-          - not_null
-          - accepted_values:
-              arguments:
-                values: ['West', 'Midwest', 'Northeast', 'South']
   
-  - name: dim_sponsorship
-    description: "a dimension which hold information about sponsorship investments for different brands"
+  - name: dim_category
     columns:
-      - name: sponsorship_key
-        description: "unique surrogate key identifier for each sponsorship inevestment"
+      - name: category_key
+        tests:
+          - unique
+          - not_null
+      - name: category
         tests:
           - not_null
           - unique
 
+  - name: dim_subcategory
+    columns:
+      - name: subcategory_key
+        tests:
+          - unique
+          - not_null
+      - name: subcategory
+        tests:
+          - not_null
+      - name: category_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_category')
+                field: category_key
+  
+  
+  - name: dim_bridge_brand_subcategory
+    columns:
+      - name: brand_subcategory_key
+        tests:
+          - unique
+          - not_null
       - name: brand_key
-        description: "foreign key that links sponsorship to dim_brand."
         tests:
           - not_null
           - relationships:
               arguments:
                 to: ref('dim_brand')
                 field: brand_key
-
-      - name: sponsorship_invest
-        description: "Sponsorship spending in millions of USD. Can be null if not applicable."
+      - name: subcategory_key
         tests:
-          - dbt_utils.expression_is_true:
+          - not_null
+          - relationships:
               arguments:
-                expression: ">= 0 OR sponsorship_invest IS NULL"
+                to: ref('dim_subcategory')
+                field: subcategory_key
+  
+
+  - name: dim_sponsorship
+    description: "a dimension which hold information about sponsorship investments for different brands"
+    columns:
+      - name: sponsorship_key
+        tests:
+          - not_null
+          - unique
 
           
           
@@ -144,4 +175,6 @@ models:
               arguments:
                 to: ref('dim_region')
                 field: region_key
-
+      - name: transaction_date
+        tests:
+          - not_null
