@@ -1,7 +1,8 @@
 {{ config(materialized='table') }}
 
 select distinct
-    {{ dbt_utils.generate_surrogate_key(['subcategory']) }} as subcategory_key,
-    subcategory,
-    {{ dbt_utils.generate_surrogate_key(['category']) }} as category_key
+    {{ dbt_utils.generate_surrogate_key(['c_subcategory','c_category']) }} as subcategory_key,
+    c_subcategory AS Subcategory,
+    {{ dbt_utils.generate_surrogate_key(['c_category']) }} as category_key,
+    c_category AS Category
 from {{ ref('stg_fan_behavior') }}

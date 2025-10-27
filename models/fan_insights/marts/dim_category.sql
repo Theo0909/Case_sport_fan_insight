@@ -2,5 +2,5 @@
 
 select distinct
     {{ dbt_utils.generate_surrogate_key(['category']) }} as category_key,
-    category
+    c_category AS category
 from {{ ref('stg_fan_behavior') }}

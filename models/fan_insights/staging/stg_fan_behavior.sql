@@ -1,63 +1,52 @@
 {{ config(materialized='view') }}
 
-SELECT
+with cleaned as (
+
+    select
+        -- Clean brand
+        lower(replace(brand,' ','')) as c_brand,
+
+        -- Clean category, override Under Armour
+        case
+            when lower(replace(brand,' ','')) = 'underarmour'
+                then 'apparel/sportsequipment'
+            else lower(replace(category,' ',''))
+        end as c_category,
+
+        -- Clean subcategory
+        lower(replace(subcategory,' ','')) as c_subcategory,
+
+        audience,
+        region,
+        spend,
+        transaction_date,
+        population_index,
+        percent_composition
+
+    from {{ source('sports_fan_behavior', 'SPORTS_FAN_BEHAVIOR') }}
+)
+
+select
     {{ dbt_utils.generate_surrogate_key([
-        "lower(trim(regexp_replace(translate(brand, chr(160), ' '), '\\\\s+', ' ')))",
+        "c_brand",
         "audience",
         "region",
-        "lower(trim(regexp_replace(translate(category, chr(160), ' '), '\\\\s+', ' ')))",
-        "lower(trim(regexp_replace(translate(subcategory, chr(160), ' '), '\\\\s+', ' ')))",
+        "c_category",
+        "c_subcategory",
         "spend",
         "population_index",
         "percent_composition",
         "transaction_date"
     ]) }} as fan_behavior_id,
 
-    lower(
-      trim(
-        regexp_replace(
-          translate(brand, chr(160), ' '),
-          '\\s+',
-          ''
-        )
-      )
-    ) as brand,
-
+    c_brand,
     audience,
     region,
-
-    case
-        when lower(trim(regexp_replace(translate(brand, chr(160), ' '), '\\s+', ' ')))
-            = 'under armour' then 'apparel / sports equipment'
-        else lower(
-              trim(
-                regexp_replace(
-                  translate(category, chr(160), ' '),
-                  '\\s+',
-                  ' '
-                )
-              )
-            )
-    end as category,
-
-    lower(
-  trim(
-    regexp_replace(
-      translate(
-        regexp_replace(subcategory, '[^[:print:]]', ''),  -- remove invisible unicode
-        chr(160),                                         -- replace NBSP
-        ' '
-      ),
-      '\\s+',
-      ' '
-    )
-  )
-) as subcategory,
-
-
+    c_category,
+    c_subcategory,
     spend,
     transaction_date,
     population_index,
     percent_composition
 
-FROM {{ source('sports_fan_behavior', 'SPORTS_FAN_BEHAVIOR') }}
+from cleaned

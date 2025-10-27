@@ -1,16 +1,8 @@
 {{ config(materialized='view') }}
 
 SELECT
-    lower(
-        trim(
-            regexp_replace(
-                translate(brand, chr(160), ' '),
-                '\\s+',
-                ''
-            )
-        )
-    ) as brand,
-
+    -- Aligning each brand name
+    LOWER(REPLACE(brand,' ','')) AS c_brand,
     sport,
     sponsorship_type,
     sponsorship_tier,
