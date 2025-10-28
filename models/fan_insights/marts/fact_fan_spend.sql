@@ -7,7 +7,7 @@ WITH base AS (
         transaction_date,
         audience,
         region,
-        brand
+        c_brand
     FROM {{ ref('stg_fan_behavior') }}
 ),
 
@@ -18,11 +18,13 @@ joined as (
         base.transaction_date,
         b.brand_key,
         a.audience_key,
-        r.region_key
+        r.region_key,
+        d.date_key
     FROM base 
-    LEFT JOIN {{ ref('dim_brand') }} AS b on base.brand = b.brand
-    LEFT JOIN {{ ref('dim_audience') }} AS a on base.audience = a.audience
-    LEFT JOIN {{ ref('dim_region') }} AS r on base.region = r.region
+    LEFT JOIN {{ ref('dim_brand') }} AS b ON base.c_brand = b.brand
+    LEFT JOIN {{ ref('dim_audience') }} AS a ON base.audience = a.audience
+    LEFT JOIN {{ ref('dim_region') }} AS r ON base.region = r.region
+    LEFT JOIN {{ref('dim_date')}} AS d ON base.transaction_date = d.date
 )
 
 SELECT
@@ -37,6 +39,7 @@ SELECT
     brand_key,
     audience_key,
     region_key,
+    date_key,
     spend,
     transaction_date
 FROM joined

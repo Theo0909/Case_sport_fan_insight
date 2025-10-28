@@ -2,7 +2,7 @@
 
 WITH spons AS (
     SELECT DISTINCT
-        brand,
+        c_brand AS sponsorship_brand,
         year,
         sport,
         sponsorship_type,
@@ -13,18 +13,14 @@ WITH spons AS (
 
 SELECT
     {{ dbt_utils.generate_surrogate_key([
-        "lower(trim(brand))",
+        "sponsorship_brand",
         "sport",
         "sponsorship_type",
         "sponsorship_tier",
         "year",
         "investment"
     ]) }} as sponsorship_key,
-
-    {{ dbt_utils.generate_surrogate_key([
-        "lower(trim(brand))"
-    ]) }} as brand_key,
-
+    brand_key,
     year,
     sport,
     sponsorship_type,
@@ -32,3 +28,4 @@ SELECT
     investment
 
 FROM spons
+LEFT JOIN {{ref('dim_brand')}} ON spons.sponsorship_brand = dim_brand.brand

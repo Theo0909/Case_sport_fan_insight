@@ -43,13 +43,14 @@ models:
           - accepted_values:
               arguments:
                 values: ['West', 'Midwest', 'Northeast', 'South']
-      - name: brand
+      - name: c_brand
         tests:
           - not_null
-      - name: category
+      - name: c_category
         description: "High-level industry classification for the brand."
-      - name: subcategory
+      - name: c_subcategory
         description: "More specific segment within the brand category."
+
  
 
  # Key uniqueness test 
@@ -145,8 +146,14 @@ models:
           - not_null
           - unique
 
-          
-          
+ #checking whether the generated dates keys are unique         
+  - name: dim_date         
+    columns:
+      - name: date_key
+        description: "simple number key for each day from 2025-01-01 to 2030-12-31"
+        tests:
+          - unique
+          - not_null
 
   
   #Fact table with defined relationships to the different dimensions
@@ -175,6 +182,14 @@ models:
               arguments:
                 to: ref('dim_region')
                 field: region_key
+      - name: date_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+                
       - name: transaction_date
         tests:
           - not_null

@@ -4,8 +4,8 @@
 
 WITH base AS (
     SELECT distinct
-        {{ dbt_utils.generate_surrogate_key(['brand']) }} AS brand_key,
-        {{ dbt_utils.generate_surrogate_key(['subcategory']) }} AS subcategory_key
+        {{ dbt_utils.generate_surrogate_key(['c_brand']) }} AS brand_key,
+        {{ dbt_utils.generate_surrogate_key(['c_subcategory', 'c_category']) }} AS subcategory_key,
     FROM {{ ref('stg_fan_behavior') }} 
 )
 
