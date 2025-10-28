@@ -1,8 +1,11 @@
 {{ config(materialized='table') }}
 
-select distinct
-    {{ dbt_utils.generate_surrogate_key(['c_subcategory','c_category']) }} as subcategory_key,
-    c_subcategory AS Subcategory,
-    {{ dbt_utils.generate_surrogate_key(['c_category']) }} as category_key,
-    c_category AS Category
-from {{ ref('stg_fan_behavior') }}
+SELECT DISTINCT
+    {{ dbt_utils.generate_surrogate_key(['stg.c_subcategory', 'stg.c_category']) }} AS subcategory_key,
+    stg.c_subcategory AS subcategory,
+    stg.c_category AS category,
+    c.category_key
+
+FROM {{ ref('stg_fan_behavior') }} AS stg
+JOIN {{ ref('dim_category') }} AS c 
+    ON stg.c_category = c.category

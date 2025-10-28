@@ -28,4 +28,4 @@ SELECT
     investment
 
 FROM spons
-LEFT JOIN dim_brand ON spons.sponsorship_brand = dim_brand.brand
+LEFT JOIN {{ref('dim_brand')}} ON spons.sponsorship_brand = dim_brand.brand
