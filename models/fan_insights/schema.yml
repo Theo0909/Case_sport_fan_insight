@@ -2,14 +2,13 @@ version: 2
 
 #Data sources
 sources:
-  - name: sports_fan_behavior
-    description: "Source Snowflake table with raw sports fan transactions."
-    database: PC_DBT_DB
-    schema: DBT_THANSEN
+  - name: raw
+    schema: main
+    description: "DuckDB table containing raw sports fan behavior data."
     tables:
-      - name: SPORTS_FAN_BEHAVIOR
-        description: "Raw sports fans dataset. Contains information about there sports interest, latest purchase in a given brand and amount"
-
+      - name: sports_fan_behavior
+        description: "Raw sports fans dataset"
+seeds:
   - name: brand_sponserships
     description: "Seed dataset containing brand sponsorship investment data."
     tables:

@@ -23,7 +23,7 @@ with cleaned as (
         population_index,
         percent_composition
 
-    from {{ source('sports_fan_behavior', 'SPORTS_FAN_BEHAVIOR') }}
+    from {{ source('raw', 'sports_fan_behavior') }}
 )
 
 select

@@ -1,0 +1,16 @@
+duck:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: /Users/theolyngaa/Desktop/2_samtale_Leap/Case_sport_fan_insight/data/warehouse.duckdb
+      schema: main
+      threads: 4
+      extensions:
+        - httpfs
+        - parquet
+      settings:
+        enable_progress_bar: true
+        memory_limit: "2GB"
+
+
