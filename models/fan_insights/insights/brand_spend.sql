@@ -21,9 +21,9 @@ ranked AS (
 
 SELECT
     a.audience,
-    MAX(CASE WHEN spend_rank_desc = 1 THEN brand END) AS most_spent_brand,
-    MAX(CASE WHEN spend_rank_asc = 1 THEN brand END) AS least_spent_brand,
+    CASE WHEN spend_rank_desc = 1 THEN brand END AS most_spent_brand,
+    CASE WHEN spend_rank_asc = 1 THEN brand END AS least_spent_brand,
     SUM(total_spend) AS total_audience_spend
 FROM ranked AS a
-GROUP BY a.audience
+GROUP BY all
 ORDER BY total_audience_spend DESC
