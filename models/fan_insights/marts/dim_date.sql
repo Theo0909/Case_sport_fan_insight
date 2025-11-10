@@ -1,5 +1,3 @@
-{{ config(materialized='table') }}
-
 -- Generating a dates from 2025 to 2030 (the oldest date in the data source is from january 2025)
 WITH date_spine AS (
     {{dbt_utils.date_spine(datepart="day", start_date="CAST('2025-01-01' AS date)", end_date="CAST('2030-12-31' AS date)")}}

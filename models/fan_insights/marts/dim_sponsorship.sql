@@ -1,5 +1,3 @@
-{{ config(materialized='table') }}
-
 WITH spons AS (
     SELECT DISTINCT
         c_brand AS sponsorship_brand,

@@ -1,5 +1,3 @@
-{{ config(materialized='table') }}
-
 WITH base AS (
     SELECT
         fan_behavior_id,

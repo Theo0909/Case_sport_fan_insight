@@ -1,5 +1,3 @@
-{{ config(materialized='table') }}
-
 SELECT DISTINCT
     {{ dbt_utils.generate_surrogate_key(['region']) }} AS region_key,
     region

@@ -1,5 +1,3 @@
-{{ config(materialized='view') }}
-
 SELECT
     -- Aligning each brand name
     LOWER(REPLACE(brand,' ','')) AS c_brand,
