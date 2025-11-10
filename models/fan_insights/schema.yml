@@ -13,8 +13,7 @@ seeds:
     description: "Seed dataset containing brand sponsorship investment data."
     tables:
       - name: brand_sponserships
-        description: >
-          "brand_sponsorship containts information about different sponsorships by brands in a specific sport. It also includes the amount of money invested in the sponsorships"
+        description: "brand_sponsorship containts information about different sponsorships by brands in a specific sport. It also includes the amount of money invested in the sponsorships"
 
 
 
@@ -60,13 +59,6 @@ models:
         tests:
           - not_null
           - unique
-      - name: category_key
-        tests:
-          - not_null
-          - relationships:
-              arguments:
-                to: ref('dim_category')
-                field: category_key
   
   
   - name: dim_audience
@@ -86,55 +78,13 @@ models:
           - unique 
           - not_null
   
-  - name: dim_category
+  - name: dim_brand_product
     columns:
-      - name: category_key
+      - name: brand_product_key
         tests:
           - unique
           - not_null
-      - name: category
-        tests:
-          - not_null
-          - unique
 
-  - name: dim_subcategory
-    columns:
-      - name: subcategory_key
-        tests:
-          - unique
-          - not_null
-      - name: subcategory
-        tests:
-          - not_null
-      - name: category_key
-        tests:
-          - not_null
-          - relationships:
-              arguments:
-                to: ref('dim_category')
-                field: category_key
-  
-  
-  - name: dim_bridge_brand_subcategory
-    columns:
-      - name: brand_subcategory_key
-        tests:
-          - unique
-          - not_null
-      - name: brand_key
-        tests:
-          - not_null
-          - relationships:
-              arguments:
-                to: ref('dim_brand')
-                field: brand_key
-      - name: subcategory_key
-        tests:
-          - not_null
-          - relationships:
-              arguments:
-                to: ref('dim_subcategory')
-                field: subcategory_key
   
 
   - name: dim_sponsorship
@@ -188,6 +138,14 @@ models:
               arguments:
                 to: ref('dim_date')
                 field: date_key
+      - name: brand_product_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_brand_product')
+                field: brand_product_key 
+
                 
       - name: transaction_date
         tests:

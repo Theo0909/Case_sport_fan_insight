@@ -9,7 +9,7 @@ with cleaned as (
         -- Clean category, override Under Armour
         case
             when lower(replace(brand,' ','')) = 'underarmour'
-                then 'apparel/sportsequipment'
+                then 'sportswear'
             else lower(replace(category,' ',''))
         end as c_category,
 
